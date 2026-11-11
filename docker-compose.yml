@@ -1,0 +1,36 @@
+services:
+
+  app:
+    container_name: jomodas-app
+    build: .
+    ports:
+      - "8021:8020" # Alterado para 8021 no seu computador
+    volumes:
+      - ./:/var/www/html
+    user: "1000:1000"
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: jomodas-mysql
+    image: mysql:8.4
+    ports:
+      - "3309:3306" # Alterado para 3309 no seu computador
+    environment:
+      MYSQL_DATABASE: jomodas_db
+      MYSQL_USER: jomodas_user
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - jomodas-mysql-data:/var/lib/mysql
+
+  adminer:
+    container_name: jomodas-adminer
+    image: adminer
+    ports:
+      - "8041:8080" # Alterado para 8041 no seu computador
+    depends_on:
+      - mysql
+
+volumes:
+  jomodas-mysql-data:
