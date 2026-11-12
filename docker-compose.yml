@@ -15,7 +15,7 @@ services:
     container_name: jomodas-mysql
     image: mysql:8.4
     ports:
-      - "3309:3306" # Alterado para 3309 no seu computador
+      - "3309:3306" 
     environment:
       MYSQL_DATABASE: jomodas_db
       MYSQL_USER: jomodas_user

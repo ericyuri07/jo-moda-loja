@@ -12,5 +12,4 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
         ]);
     }
-}composer dump-autoload
-php artisan migrate:fresh --seed
+}
