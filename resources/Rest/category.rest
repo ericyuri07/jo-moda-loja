@@ -1,0 +1,38 @@
+@baseUrl = http://127.0.0.1:8000/api
+@token = {{login.response.body.token}}
+
+### 0. Registrar usuário (rode 1 vez se ainda não criou no banco)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Eric",
+    "email": "eric@teste.com",
+    "password": "password123"
+}
+
+### 1. Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "eric@teste.com",
+    "password": "password123"
+}
+
+### 2. Listar categorias
+GET {{baseUrl}}/categories
+Accept: application/json
+
+### 3. Criar categoria
+POST {{baseUrl}}/categories
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Camisetas"
+}
