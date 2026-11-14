@@ -8,6 +8,9 @@ services:
     volumes:
       - ./:/var/www/html
     user: "1000:1000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
     depends_on:
       - mysql
 

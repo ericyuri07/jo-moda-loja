@@ -14,10 +14,6 @@ class CategoryUpdateRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Se o nome mudou e o slug não foi enviado, gera o slug a partir do nome.
-     * Assim a regra "unique" consegue validá-lo (422 em vez de 500).
-     */
     protected function prepareForValidation(): void
     {
         if ($this->filled('name') && !$this->filled('slug')) {

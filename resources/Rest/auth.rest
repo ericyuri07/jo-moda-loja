@@ -43,3 +43,15 @@ Authorization: Bearer {{loginAdmin.response.body.token}}
 POST {{baseUrl}}/auth/logout
 Accept: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### 6. Registrar administrador (exige ADMIN_REGISTER_CODE do .env)
+POST {{baseUrl}}/auth/register-admin
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Nova Admin",
+    "email": "nova.admin@jomodas.com",
+    "password": "admin123",
+    "admin_code": "COLOQUE_AQUI_O_ADMIN_REGISTER_CODE_DO_.env"
+}

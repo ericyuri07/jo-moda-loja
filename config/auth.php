@@ -114,4 +114,16 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Código para cadastrar administradores
+    |--------------------------------------------------------------------------
+    |
+    | Usado por POST /api/auth/register-admin. Vazio = cadastro de admin
+    | desligado.
+    |
+    */
+
+    'admin_register_code' => env('ADMIN_REGISTER_CODE', ''),
+
 ];

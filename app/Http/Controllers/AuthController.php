@@ -29,6 +29,46 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Cadastro de administrador pelo app (botão "Entrar como ADM" do login).
+     * Mesmos campos do cadastro normal, mas o usuário já nasce como admin.
+     */
+    public function registerAdmin(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'admin_code' => 'required|string',
+        ], [
+            'admin_code.required' => 'O código de acesso de administrador é obrigatório.',
+        ]);
+
+        $expectedCode = (string) config('auth.admin_register_code');
+
+        if ($expectedCode === '') {
+            abort(403, 'O cadastro de administradores está desativado.');
+        }
+
+        if (!hash_equals($expectedCode, $data['admin_code'])) {
+            throw ValidationException::withMessages([
+                'admin_code' => ['Código de acesso de administrador inválido.'],
+            ]);
+        }
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role' => User::ROLE_ADMIN,
+        ]);
+
+        return response()->json([
+            'user' => $user,
+            'token' => $user->createToken('api-token')->plainTextToken,
+        ], 201);
+    }
+
     public function login(Request $request)
     {
         $data = $request->validate([

@@ -8,18 +8,13 @@ use Illuminate\Support\Str;
 
 class CategoryStoreRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Gera o slug a partir do nome quando ele não é enviado,
-     * para que a regra "unique" consiga validá-lo (422 em vez de 500).
-     */
+    
     protected function prepareForValidation(): void
     {
         if (!$this->filled('slug') && $this->filled('name')) {

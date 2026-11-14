@@ -8,6 +8,6 @@ ENV COMPOSER_HOME=/tmp/composer
 
 WORKDIR /var/www/html
 
-EXPOSE 8000
+EXPOSE 8020
 
-CMD composer install && php artisan serve --host=0.0.0.0 --port=8020
+CMD composer install && php artisan serve --host=0.0.0.0 --port=8020 --no-reload
