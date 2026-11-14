@@ -1,38 +1,52 @@
+# php artisan serve -> 8000 | Docker -> 8021
 @baseUrl = http://127.0.0.1:8000/api
-@token = {{login.response.body.token}}
 
-### 0. Registrar usuário (rode 1 vez se ainda não criou no banco)
-POST {{baseUrl}}/auth/register
-Content-Type: application/json
-Accept: application/json
+# Fluxo: rode o "Login como admin" (0), depois "Criar categoria" (2).
+# O id da categoria criada é reaproveitado nas requisições 3, 4 e 5.
+@token = {{loginAdmin.response.body.token}}
+@categoryId = {{createCategory.response.body.id}}
 
-{
-    "name": "Eric",
-    "email": "eric@teste.com",
-    "password": "password123"
-}
-
-### 1. Login
-# @name login
+### 0. Login como admin (necessário para criar/editar/excluir)
+# @name loginAdmin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 Accept: application/json
 
 {
-    "email": "eric@teste.com",
-    "password": "password123"
+    "email": "admin@jomodas.com",
+    "password": "admin123"
 }
 
-### 2. Listar categorias
+### 1. Listar categorias (público)
 GET {{baseUrl}}/categories
 Accept: application/json
 
-### 3. Criar categoria
+### 2. Criar categoria (admin) — slug é gerado a partir do nome se omitido
+# @name createCategory
 POST {{baseUrl}}/categories
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "Camisetas"
+    "name": "Bonés"
 }
+
+### 3. Buscar categoria por ID (público)
+GET {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+
+### 4. Atualizar categoria (admin)
+PUT {{baseUrl}}/categories/{{categoryId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Bonés e Chapéus"
+}
+
+### 5. Deletar categoria (admin)
+DELETE {{baseUrl}}/categories/{{categoryId}}
+Accept: application/json
+Authorization: Bearer {{token}}

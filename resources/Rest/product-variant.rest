@@ -1,0 +1,94 @@
+@baseUrl = http://127.0.0.1:8000/api
+@token = {{loginAdmin.response.body.token}}
+@productId = {{listProducts.response.body.data[0].id}}
+@variantId = {{createVariant.response.body.id}}
+
+###
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@jomodas.com",
+    "password": "admin123"
+}
+
+###
+# @name listProducts
+GET {{baseUrl}}/products
+Accept: application/json
+
+###
+# @name listVariants
+GET {{baseUrl}}/product-variants
+Accept: application/json
+
+###
+# @name listVariantsByProduct
+GET {{baseUrl}}/product-variants?product_id={{productId}}&size=M
+Accept: application/json
+
+###
+# @name createVariant
+POST {{baseUrl}}/product-variants
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "product_id": "{{productId}}",
+    "size": "GG",
+    "color": "Verde",
+    "stock": 10
+}
+
+###
+# @name showVariant
+GET {{baseUrl}}/product-variants/{{variantId}}
+Accept: application/json
+
+###
+# @name updateVariant
+PUT {{baseUrl}}/product-variants/{{variantId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "stock": 25
+}
+
+###
+# @name createVariantDuplicated
+POST {{baseUrl}}/product-variants
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "product_id": "{{productId}}",
+    "size": "GG",
+    "color": "Verde",
+    "stock": 5
+}
+
+###
+# @name createVariantInvalid
+POST {{baseUrl}}/product-variants
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "product_id": "00000000-0000-0000-0000-000000000000",
+    "size": "M",
+    "color": "Azul",
+    "stock": -1
+}
+
+###
+# @name deleteVariant
+DELETE {{baseUrl}}/product-variants/{{variantId}}
+Accept: application/json
+Authorization: Bearer {{token}}

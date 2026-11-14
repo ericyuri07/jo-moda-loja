@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class CategoryStoreRequest extends FormRequest
 {
@@ -13,6 +14,17 @@ class CategoryStoreRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    /**
+     * Gera o slug a partir do nome quando ele não é enviado,
+     * para que a regra "unique" consiga validá-lo (422 em vez de 500).
+     */
+    protected function prepareForValidation(): void
+    {
+        if (!$this->filled('slug') && $this->filled('name')) {
+            $this->merge(['slug' => Str::slug($this->input('name'))]);
+        }
     }
 
     /**

@@ -4,7 +4,7 @@ services:
     container_name: jomodas-app
     build: .
     ports:
-      - "8021:8020" # Alterado para 8021 no seu computador
+      - "8021:8020"
     volumes:
       - ./:/var/www/html
     user: "1000:1000"
@@ -28,7 +28,7 @@ services:
     container_name: jomodas-adminer
     image: adminer
     ports:
-      - "8041:8080" # Alterado para 8041 no seu computador
+      - "8041:8080" 
     depends_on:
       - mysql
 

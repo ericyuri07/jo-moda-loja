@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ProductUpdateRequest extends FormRequest
@@ -11,6 +12,14 @@ class ProductUpdateRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('name') && !$this->filled('slug')) {
+            $this->merge(['slug' => Str::slug($this->input('name'))]);
+        }
     }
 
     /**

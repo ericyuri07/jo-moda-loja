@@ -1,0 +1,97 @@
+@baseUrl = http://127.0.0.1:8000/api
+@token = {{loginAdmin.response.body.token}}
+@adminId = {{loginAdmin.response.body.user.id}}
+@userId = {{createUser.response.body.id}}
+
+###
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@jomodas.com",
+    "password": "admin123"
+}
+
+###
+# @name listUsers
+GET {{baseUrl}}/users
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+# @name listUsersFiltered
+GET {{baseUrl}}/users?role=customer&search=cliente
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+# @name createUser
+POST {{baseUrl}}/users
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Usuário Teste Rest",
+    "email": "usuario.rest@jomodas.com",
+    "password": "senha1234",
+    "role": "customer",
+    "address": "Rua Teste, 10 - Guarapuava/PR"
+}
+
+###
+# @name showUser
+GET {{baseUrl}}/users/{{userId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+# @name updateUser
+PUT {{baseUrl}}/users/{{userId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Usuário Teste Rest Editado",
+    "role": "admin"
+}
+
+###
+# @name createUserDuplicated
+POST {{baseUrl}}/users
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Duplicado",
+    "email": "usuario.rest@jomodas.com",
+    "password": "123",
+    "role": "gerente"
+}
+
+###
+# @name removeOwnAdmin
+PUT {{baseUrl}}/users/{{adminId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "role": "customer"
+}
+
+###
+# @name deleteSelf
+DELETE {{baseUrl}}/users/{{adminId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+# @name deleteUser
+DELETE {{baseUrl}}/users/{{userId}}
+Accept: application/json
+Authorization: Bearer {{token}}

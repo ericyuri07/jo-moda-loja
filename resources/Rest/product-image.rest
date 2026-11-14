@@ -1,0 +1,76 @@
+@baseUrl = http://127.0.0.1:8000/api
+@token = {{loginAdmin.response.body.token}}
+@productId = {{listProducts.response.body.data[0].id}}
+@imageId = {{createImage.response.body.id}}
+
+###
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@jomodas.com",
+    "password": "admin123"
+}
+
+###
+# @name listProducts
+GET {{baseUrl}}/products
+Accept: application/json
+
+###
+# @name listImages
+GET {{baseUrl}}/product-images
+Accept: application/json
+
+###
+# @name listImagesByProduct
+GET {{baseUrl}}/product-images?product_id={{productId}}
+Accept: application/json
+
+###
+# @name createImage
+POST {{baseUrl}}/product-images
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "product_id": "{{productId}}",
+    "image_url": "https://picsum.photos/seed/imagem-teste-rest/600/800"
+}
+
+###
+# @name showImage
+GET {{baseUrl}}/product-images/{{imageId}}
+Accept: application/json
+
+###
+# @name updateImage
+PUT {{baseUrl}}/product-images/{{imageId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "image_url": "https://picsum.photos/seed/imagem-teste-rest-2/600/800"
+}
+
+###
+# @name createImageInvalid
+POST {{baseUrl}}/product-images
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "product_id": "00000000-0000-0000-0000-000000000000",
+    "image_url": "isso-nao-e-url"
+}
+
+###
+# @name deleteImage
+DELETE {{baseUrl}}/product-images/{{imageId}}
+Accept: application/json
+Authorization: Bearer {{token}}

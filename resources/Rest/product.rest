@@ -1,0 +1,111 @@
+# php artisan serve -> 8000 | Docker -> 8021
+@baseUrl = http://127.0.0.1:8000/api
+
+# Fluxo: rode 0 (login) e 1 (categorias), depois 5 (criar).
+# O token, a categoria e o id do produto criado são reaproveitados nas demais.
+@token = {{loginAdmin.response.body.token}}
+@categoryId = {{listCategories.response.body.$[0].id}}
+@productId = {{createProduct.response.body.id}}
+
+### 0. Login como admin (necessário para criar/editar/excluir)
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@jomodas.com",
+    "password": "admin123"
+}
+
+### 1. Listar categorias (pega o id da primeira para usar no produto)
+# @name listCategories
+GET {{baseUrl}}/categories
+Accept: application/json
+
+### 2. Listar produtos (público, paginado, com categoria, imagens e variantes)
+GET {{baseUrl}}/products
+Accept: application/json
+
+### 3. Listar produtos com filtros (search, category_id, featured)
+GET {{baseUrl}}/products?search=vestido&featured=false
+Accept: application/json
+
+### 4. Listar produtos de uma categoria
+GET {{baseUrl}}/products?category_id={{categoryId}}
+Accept: application/json
+
+### 5. Criar produto (admin) — slug é gerado a partir do nome se omitido
+# @name createProduct
+POST {{baseUrl}}/products
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Vestido Teste Rest",
+    "description": "Vestido criado pelo arquivo .rest",
+    "price": 199.90,
+    "promotional_price": 149.90,
+    "category_id": "{{categoryId}}",
+    "image_url": "https://picsum.photos/seed/vestido-teste-rest/600/800",
+    "featured": true
+}
+
+### 6. Buscar produto por ID (público)
+GET {{baseUrl}}/products/{{productId}}
+Accept: application/json
+
+### 7. Atualizar produto (admin) — envie só os campos que mudam
+PUT {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "price": 179.90,
+    "promotional_price": null,
+    "featured": false
+}
+
+### 8. ERRO: preço promocional maior que o preço (422)
+PUT {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "promotional_price": 500
+}
+
+### 9. ERRO: criar com slug duplicado e categoria inexistente (422)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Vestido Teste Rest",
+    "price": 100,
+    "category_id": "00000000-0000-0000-0000-000000000000"
+}
+
+### 10. ERRO: criar sem token (401)
+POST {{baseUrl}}/products
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Sem Token",
+    "price": 10,
+    "category_id": "{{categoryId}}"
+}
+
+### 11. Deletar produto (admin)
+DELETE {{baseUrl}}/products/{{productId}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 12. ERRO: buscar produto excluído (404)
+GET {{baseUrl}}/products/{{productId}}
+Accept: application/json

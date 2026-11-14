@@ -1,0 +1,45 @@
+# php artisan serve -> 8000 | Docker -> 8021
+@baseUrl = http://127.0.0.1:8000/api
+
+### 1. Registrar novo usuário (sempre criado como customer)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Maria Teste",
+    "email": "maria@teste.com",
+    "password": "senha123"
+}
+
+### 2. Login como admin
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@jomodas.com",
+    "password": "admin123"
+}
+
+### 3. Login como cliente
+# @name loginCliente
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "cliente@jomodas.com",
+    "password": "cliente123"
+}
+
+### 4. Usuário logado (rode o login admin antes)
+GET {{baseUrl}}/auth/me
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### 5. Logout (revoga o token atual)
+POST {{baseUrl}}/auth/logout
+Accept: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
