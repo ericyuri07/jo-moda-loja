@@ -12,9 +12,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            CategorySeeder::class,   // 1º: produtos dependem das categorias
+            CategorySeeder::class,
             UserSeeder::class,
-            ProductSeeder::class,    // depende de Category
+            ProductSeeder::class,
+            ProductVariantSeeder::class,
+            ProductImageSeeder::class,
         ]);
     }
 }

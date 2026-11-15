@@ -15,7 +15,7 @@ class ProductImageFactory extends Factory
     {
         return [
             'product_id' => Product::factory(),
-            'image_url' => 'https://picsum.photos/seed/' . fake()->unique()->uuid() . '/600/800',
+            'image_url' => 'https://picsum.photos/seed/'.fake()->unique()->uuid().'/600/800',
         ];
     }
 }

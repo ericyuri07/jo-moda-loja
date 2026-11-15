@@ -21,7 +21,6 @@ class ProductVariantUpdateRequest extends FormRequest
         $variant = $this->route('product_variant');
 
         return [
-            // product_id não é editável: variante não muda de produto
             'size' => [
                 'sometimes',
                 'required',
@@ -30,7 +29,7 @@ class ProductVariantUpdateRequest extends FormRequest
                 Rule::unique('product_variants')
                     ->ignore($variant)
                     ->where(
-                        fn($query) => $query
+                        fn ($query) => $query
                             ->where('product_id', $variant->product_id)
                             ->where('color', $this->input('color', $variant->color))
                     ),

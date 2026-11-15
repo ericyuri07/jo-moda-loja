@@ -10,40 +10,33 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function __construct(private ProductService $service)
-    {
-    }
+    public function __construct(private ProductService $service) {}
 
     public function index(Request $request)
     {
-        // filtros opcionais: ?category_id=...&search=...&featured=true
-        // admin vê também os inativos; visitante/cliente só os ativos
-        return $this->service->list(
+        return response()->json($this->service->list(
             $request->only(['category_id', 'search', 'featured']),
-            onlyActive: !$this->isAdmin($request)
-        );
+            onlyActive: ! $this->isAdmin($request)
+        ));
     }
 
     public function store(ProductStoreRequest $request)
     {
-        $data = $request->validated();
-
-        return response($this->service->create($data), 201);
+        return response()->json($this->service->create($request->validated()), 201);
     }
 
     public function show(Request $request, Product $product)
     {
-        // produto inativo não existe para quem não é admin
-        abort_if(!$product->active && !$this->isAdmin($request), 404, 'Produto não encontrado.');
+        abort_if(! $product->active && ! $this->isAdmin($request), 404, 'Produto não encontrado.');
 
-        return $this->service->find($product);
+        return response()->json($this->service->find($product));
     }
 
     public function update(ProductUpdateRequest $request, Product $product)
     {
-        $data = $request->validated();
-
-        return $this->service->update($product, $data);
+        return response()->json(
+            $this->service->update($product, $request->validated())
+        );
     }
 
     public function destroy(Product $product)

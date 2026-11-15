@@ -3,40 +3,35 @@
 namespace App\Services;
 
 use App\Models\ProductVariant;
+use App\Repositories\Contracts\ProductVariantRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductVariantService
 {
-    public function list(array $filters = [])
+    public function __construct(private ProductVariantRepositoryInterface $repository) {}
+
+    public function list(array $filters = []): LengthAwarePaginator
     {
-        return ProductVariant::with('product')
-            ->when($filters['product_id'] ?? null, fn($q, $v) => $q->where('product_id', $v))
-            ->when($filters['size'] ?? null, fn($q, $v) => $q->where('size', $v))
-            ->when($filters['color'] ?? null, fn($q, $v) => $q->where('color', $v))
-            ->orderBy('product_id')
-            ->orderBy('size')
-            ->orderBy('color')
-            ->paginate();
+        return $this->repository->paginate($filters);
     }
 
     public function find(ProductVariant $variant): ProductVariant
     {
-        return $variant->load('product');
+        return $this->repository->loadRelations($variant);
     }
 
     public function create(array $data): ProductVariant
     {
-        return $this->find(ProductVariant::create($data)->refresh());
+        return $this->repository->create($data);
     }
 
     public function update(ProductVariant $variant, array $data): ProductVariant
     {
-        $variant->update($data);
-
-        return $this->find($variant->refresh());
+        return $this->repository->update($variant, $data);
     }
 
     public function delete(ProductVariant $variant): void
     {
-        $variant->delete();
+        $this->repository->delete($variant);
     }
 }

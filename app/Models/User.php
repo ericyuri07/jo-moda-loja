@@ -13,6 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, HasUuids, Notifiable;
 
     public const ROLE_ADMIN = 'admin';
+
     public const ROLE_CUSTOMER = 'customer';
 
     protected $fillable = ['name', 'email', 'password', 'role', 'address'];

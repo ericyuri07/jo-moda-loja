@@ -18,7 +18,6 @@ class ProductImageUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // product_id não é editável: a imagem não muda de produto
             'image_url' => ['required', 'url', 'max:255'],
         ];
     }

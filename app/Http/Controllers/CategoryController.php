@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Services\CategoryService;
 use App\Http\Requests\CategoryStoreRequest;
 use App\Http\Requests\CategoryUpdateRequest;
+use App\Models\Category;
+use App\Services\CategoryService;
 
 class CategoryController extends Controller
 {
     public function __construct(
         protected CategoryService $categoryService
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -28,7 +27,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        return response()->json($category);
+        return response()->json($this->categoryService->find($category));
     }
 
     public function update(CategoryUpdateRequest $request, Category $category)

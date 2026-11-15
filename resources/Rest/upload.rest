@@ -1,0 +1,76 @@
+# Docker -> 8021 | php artisan serve -> 8000
+@baseUrl = http://127.0.0.1:8021/api
+@token = {{loginAdmin.response.body.token}}
+@photoUrl = {{uploadImage.response.body.url}}
+@productId = {{listProducts.response.body.data[0].id}}
+
+# Fluxo: rode o login (0), envie a foto (1) e abra a URL devolvida (2).
+# A URL pode ser usada no image_url de produtos, categorias e imagens (3).
+
+### 0. Login como admin
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@jomodas.com",
+    "password": "admin123"
+}
+
+### 1. Enviar foto (admin) — JPG, PNG ou WEBP de até 2 MB
+# @name uploadImage
+POST {{baseUrl}}/uploads
+Accept: application/json
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=JoModasBoundary
+
+--JoModasBoundary
+Content-Disposition: form-data; name="image"; filename="foto-exemplo.png"
+Content-Type: image/png
+
+< ./foto-exemplo.png
+--JoModasBoundary--
+
+### 2. Exibir a foto enviada (público)
+GET {{photoUrl}}
+
+### 3. Usar a foto enviada como imagem extra de um produto
+# @name listProducts
+GET {{baseUrl}}/products
+Accept: application/json
+
+###
+POST {{baseUrl}}/product-images
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "product_id": "{{productId}}",
+    "image_url": "{{photoUrl}}"
+}
+
+### 4. Erro: envio sem arquivo (422)
+POST {{baseUrl}}/uploads
+Accept: application/json
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=JoModasBoundary
+
+--JoModasBoundary--
+
+### 5. Erro: foto inexistente (404)
+GET {{baseUrl}}/uploads/nao-existe.png
+Accept: application/json
+
+### 6. Erro: envio sem token (401)
+POST {{baseUrl}}/uploads
+Accept: application/json
+Content-Type: multipart/form-data; boundary=JoModasBoundary
+
+--JoModasBoundary
+Content-Disposition: form-data; name="image"; filename="foto-exemplo.png"
+Content-Type: image/png
+
+< ./foto-exemplo.png
+--JoModasBoundary--

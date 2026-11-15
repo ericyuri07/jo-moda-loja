@@ -24,9 +24,8 @@ class ProductVariantStoreRequest extends FormRequest
                 'required',
                 'string',
                 'max:20',
-                // espelha o unique(product_id, size, color) da migration
                 Rule::unique('product_variants')->where(
-                    fn($query) => $query
+                    fn ($query) => $query
                         ->where('product_id', $this->input('product_id'))
                         ->where('color', $this->input('color'))
                 ),

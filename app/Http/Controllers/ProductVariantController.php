@@ -10,32 +10,28 @@ use Illuminate\Http\Request;
 
 class ProductVariantController extends Controller
 {
-    public function __construct(private ProductVariantService $service)
-    {
-    }
+    public function __construct(private ProductVariantService $service) {}
 
     public function index(Request $request)
     {
-        return $this->service->list($request->only(['product_id', 'size', 'color']));
+        return response()->json($this->service->list($request->only(['product_id', 'size', 'color'])));
     }
 
     public function store(ProductVariantStoreRequest $request)
     {
-        $data = $request->validated();
-
-        return response($this->service->create($data), 201);
+        return response()->json($this->service->create($request->validated()), 201);
     }
 
     public function show(ProductVariant $productVariant)
     {
-        return $this->service->find($productVariant);
+        return response()->json($this->service->find($productVariant));
     }
 
     public function update(ProductVariantUpdateRequest $request, ProductVariant $productVariant)
     {
-        $data = $request->validated();
-
-        return $this->service->update($productVariant, $data);
+        return response()->json(
+            $this->service->update($productVariant, $request->validated())
+        );
     }
 
     public function destroy(ProductVariant $productVariant)

@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Product;
 
 /**
  * @extends Factory<ProductVariant>

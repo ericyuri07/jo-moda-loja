@@ -10,32 +10,28 @@ use Illuminate\Http\Request;
 
 class ProductImageController extends Controller
 {
-    public function __construct(private ProductImageService $service)
-    {
-    }
+    public function __construct(private ProductImageService $service) {}
 
     public function index(Request $request)
     {
-        return $this->service->list($request->only(['product_id']));
+        return response()->json($this->service->list($request->only(['product_id'])));
     }
 
     public function store(ProductImageStoreRequest $request)
     {
-        $data = $request->validated();
-
-        return response($this->service->create($data), 201);
+        return response()->json($this->service->create($request->validated()), 201);
     }
 
     public function show(ProductImage $productImage)
     {
-        return $this->service->find($productImage);
+        return response()->json($this->service->find($productImage));
     }
 
     public function update(ProductImageUpdateRequest $request, ProductImage $productImage)
     {
-        $data = $request->validated();
-
-        return $this->service->update($productImage, $data);
+        return response()->json(
+            $this->service->update($productImage, $request->validated())
+        );
     }
 
     public function destroy(ProductImage $productImage)

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Database\Factories;
 
 use App\Models\Category;
@@ -28,12 +27,11 @@ class ProductFactory extends Factory
             'slug' => Str::slug($name),
             'description' => fake()->sentence(12),
             'price' => $price,
-            // 30% dos produtos em promoção, sempre abaixo do preço base
             'promotional_price' => fake()->boolean(30)
                 ? round($price * fake()->randomFloat(2, 0.6, 0.9), 2)
                 : null,
             'category_id' => Category::factory(),
-            'image_url' => 'https://picsum.photos/seed/' . Str::slug($name) . '/600/800',
+            'image_url' => 'https://picsum.photos/seed/'.Str::slug($name).'/600/800',
             'featured' => fake()->boolean(20),
             'active' => true,
         ];

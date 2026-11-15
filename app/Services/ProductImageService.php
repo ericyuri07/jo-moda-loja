@@ -3,36 +3,35 @@
 namespace App\Services;
 
 use App\Models\ProductImage;
+use App\Repositories\Contracts\ProductImageRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductImageService
 {
-    public function list(array $filters = [])
+    public function __construct(private ProductImageRepositoryInterface $repository) {}
+
+    public function list(array $filters = []): LengthAwarePaginator
     {
-        return ProductImage::with('product')
-            ->when($filters['product_id'] ?? null, fn($q, $v) => $q->where('product_id', $v))
-            ->latest()
-            ->paginate();
+        return $this->repository->paginate($filters);
     }
 
     public function find(ProductImage $image): ProductImage
     {
-        return $image->load('product');
+        return $this->repository->loadRelations($image);
     }
 
     public function create(array $data): ProductImage
     {
-        return $this->find(ProductImage::create($data)->refresh());
+        return $this->repository->create($data);
     }
 
     public function update(ProductImage $image, array $data): ProductImage
     {
-        $image->update($data);
-
-        return $this->find($image->refresh());
+        return $this->repository->update($image, $data);
     }
 
     public function delete(ProductImage $image): void
     {
-        $image->delete();
+        $this->repository->delete($image);
     }
 }

@@ -19,7 +19,7 @@ $catalog = [
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('register-admin', 'registerAdmin')->middleware('throttle:5,1');
-    Route::post('login', 'login');
+    Route::post('login', 'login')->middleware('throttle:10,1');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', 'logout');
@@ -29,7 +29,6 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 
 Route::apiResources($catalog, ['only' => ['index', 'show']]);
 
-// fotos enviadas pelo app (públicas para a loja exibir)
 Route::get('uploads/{filename}', [UploadController::class, 'show'])
     ->where('filename', '[A-Za-z0-9._-]+');
 

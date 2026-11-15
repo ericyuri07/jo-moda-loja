@@ -3,31 +3,32 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
 class UserService
 {
-    public function list(array $filters = [])
+    public function __construct(private UserRepositoryInterface $repository) {}
+
+    public function list(array $filters = []): LengthAwarePaginator
     {
-        return User::query()
-            ->when($filters['role'] ?? null, fn($q, $v) => $q->where('role', $v))
-            ->when($filters['search'] ?? null, fn($q, $v) => $q->where(
-                fn($q) => $q->where('name', 'like', "%{$v}%")->orWhere('email', 'like', "%{$v}%")
-            ))
-            ->orderBy('name')
-            ->paginate();
+        return $this->repository->paginate($filters);
     }
 
     public function find(User $user): User
     {
-        return $user;
+        return $this->repository->loadRelations($user);
     }
 
     public function create(array $data): User
     {
-        return User::create($data)->refresh();
+        return $this->repository->create($data);
     }
 
+    /**
+     * Regra de negócio: o admin não pode rebaixar o próprio perfil.
+     */
     public function update(User $user, array $data, User $authUser): User
     {
         if (
@@ -40,11 +41,12 @@ class UserService
             ]);
         }
 
-        $user->update($data);
-
-        return $user->refresh();
+        return $this->repository->update($user, $data);
     }
 
+    /**
+     * Regra de negócio: o admin não pode excluir a si mesmo.
+     */
     public function delete(User $user, User $authUser): void
     {
         if ($user->is($authUser)) {
@@ -53,7 +55,7 @@ class UserService
             ]);
         }
 
-        $user->tokens()->delete();
-        $user->delete();
+        $this->repository->revokeAllTokens($user);
+        $this->repository->delete($user);
     }
 }

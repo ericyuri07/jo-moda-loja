@@ -10,32 +10,28 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function __construct(private UserService $service)
-    {
-    }
+    public function __construct(private UserService $service) {}
 
     public function index(Request $request)
     {
-        return $this->service->list($request->only(['role', 'search']));
+        return response()->json($this->service->list($request->only(['role', 'search'])));
     }
 
     public function store(UserStoreRequest $request)
     {
-        $data = $request->validated();
-
-        return response($this->service->create($data), 201);
+        return response()->json($this->service->create($request->validated()), 201);
     }
 
     public function show(User $user)
     {
-        return $this->service->find($user);
+        return response()->json($this->service->find($user));
     }
 
     public function update(UserUpdateRequest $request, User $user)
     {
-        $data = $request->validated();
-
-        return $this->service->update($user, $data, $request->user());
+        return response()->json(
+            $this->service->update($user, $request->validated(), $request->user())
+        );
     }
 
     public function destroy(Request $request, User $user)

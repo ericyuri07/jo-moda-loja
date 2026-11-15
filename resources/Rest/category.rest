@@ -1,5 +1,5 @@
-# php artisan serve -> 8000 | Docker -> 8021
-@baseUrl = http://127.0.0.1:8000/api
+# Docker -> 8021 | php artisan serve -> 8000
+@baseUrl = http://127.0.0.1:8021/api
 
 # Fluxo: rode o "Login como admin" (0), depois "Criar categoria" (2).
 # O id da categoria criada é reaproveitado nas requisições 3, 4 e 5.

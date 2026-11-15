@@ -1,5 +1,5 @@
-# php artisan serve -> 8000 | Docker -> 8021
-@baseUrl = http://127.0.0.1:8000/api
+# Docker -> 8021 | php artisan serve -> 8000
+@baseUrl = http://127.0.0.1:8021/api
 
 ### 1. Registrar novo usuário (sempre criado como customer)
 POST {{baseUrl}}/auth/register

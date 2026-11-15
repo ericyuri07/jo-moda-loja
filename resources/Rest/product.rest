@@ -1,5 +1,5 @@
-# php artisan serve -> 8000 | Docker -> 8021
-@baseUrl = http://127.0.0.1:8000/api
+# Docker -> 8021 | php artisan serve -> 8000
+@baseUrl = http://127.0.0.1:8021/api
 
 # Fluxo: rode 0 (login) e 1 (categorias), depois 5 (criar).
 # O token, a categoria e o id do produto criado são reaproveitados nas demais.

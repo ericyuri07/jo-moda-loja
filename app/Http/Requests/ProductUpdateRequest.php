@@ -14,10 +14,9 @@ class ProductUpdateRequest extends FormRequest
         return true;
     }
 
-
     protected function prepareForValidation(): void
     {
-        if ($this->filled('name') && !$this->filled('slug')) {
+        if ($this->filled('name') && ! $this->filled('slug')) {
             $this->merge(['slug' => Str::slug($this->input('name'))]);
         }
     }

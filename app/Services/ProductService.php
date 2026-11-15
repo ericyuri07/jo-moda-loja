@@ -3,27 +3,22 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Repositories\Contracts\ProductRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
 class ProductService
 {
-    public function list(array $filters = [], bool $onlyActive = true)
+    public function __construct(private ProductRepositoryInterface $repository) {}
+
+    public function list(array $filters = [], bool $onlyActive = true): LengthAwarePaginator
     {
-        return Product::with(['category', 'images', 'variants'])
-            ->when($onlyActive, fn($q) => $q->where('active', true))
-            ->when($filters['category_id'] ?? null, fn($q, $v) => $q->where('category_id', $v))
-            ->when($filters['search'] ?? null, fn($q, $v) => $q->where('name', 'like', "%{$v}%"))
-            ->when(isset($filters['featured']), fn($q) => $q->where(
-                'featured',
-                filter_var($filters['featured'], FILTER_VALIDATE_BOOLEAN)
-            ))
-            ->latest()
-            ->paginate();
+        return $this->repository->paginate($filters, $onlyActive);
     }
 
     public function find(Product $product): Product
     {
-        return $product->load(['category', 'images', 'variants']);
+        return $this->repository->loadRelations($product);
     }
 
     public function create(array $data): Product
@@ -33,13 +28,11 @@ class ProductService
             $data['promotional_price'] ?? null
         );
 
-        // refresh() traz os valores padrão do banco (ex: active = true)
-        return $this->find(Product::create($data)->refresh());
+        return $this->repository->create($data);
     }
 
     public function update(Product $product, array $data): Product
     {
-        // se o campo não veio na requisição, vale o que já está salvo
         $price = array_key_exists('price', $data) ? $data['price'] : $product->price;
         $promotionalPrice = array_key_exists('promotional_price', $data)
             ? $data['promotional_price']
@@ -47,14 +40,12 @@ class ProductService
 
         $this->ensurePromotionalPriceIsLowerThanPrice($price, $promotionalPrice);
 
-        $product->update($data);
-
-        return $this->find($product->refresh());
+        return $this->repository->update($product, $data);
     }
 
     public function delete(Product $product): void
     {
-        $product->delete();
+        $this->repository->delete($product);
     }
 
     /**
