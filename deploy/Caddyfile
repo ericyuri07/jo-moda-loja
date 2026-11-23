@@ -19,10 +19,9 @@
 	handle {
 		root * /srv/front
 
-		@assets path *.js *.wasm *.png *.jpg *.svg *.ttf *.otf *.woff2 *.json
-		header @assets Cache-Control "public, max-age=604800"
-		header /index.html Cache-Control "no-cache"
-		header /flutter_service_worker.js Cache-Control "no-cache"
+		# Os arquivos do Flutter mantêm o mesmo nome a cada build (main.dart.js...),
+		# então o navegador guarda a cópia mas confere sempre se ela mudou (ETag).
+		header Cache-Control "no-cache"
 
 		try_files {path} /index.html
 		file_server
