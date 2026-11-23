@@ -1,0 +1,36 @@
+{
+	frankenphp
+}
+
+# SITE_ADDRESS vem do .env:
+#   - sem domínio ainda: ":80"            -> http://IP-DO-SERVIDOR
+#   - com domínio:       "jomodas.com.br" -> HTTPS automático (Let's Encrypt)
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# API Laravel
+	@api path /api /api/* /up
+	handle @api {
+		root * /app/public
+		php_server
+	}
+
+	# Site Flutter Web (build/web copiado para deploy/front)
+	handle {
+		root * /srv/front
+
+		@assets path *.js *.wasm *.png *.jpg *.svg *.ttf *.otf *.woff2 *.json
+		header @assets Cache-Control "public, max-age=604800"
+		header /index.html Cache-Control "no-cache"
+		header /flutter_service_worker.js Cache-Control "no-cache"
+
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

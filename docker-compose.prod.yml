@@ -1,0 +1,44 @@
+# Produção (Oracle Cloud ou qualquer VPS):
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+# O docker-compose.yml normal continua sendo o de desenvolvimento.
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/front:/srv/front:ro
+      - jomodas-storage:/app/storage
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    # Sem "ports": o banco só é acessível de dentro do servidor.
+    volumes:
+      - jomodas-mysql-data:/var/lib/mysql
+
+volumes:
+  jomodas-mysql-data:
+  jomodas-storage:
+  caddy-data:
+  caddy-config:

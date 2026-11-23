@@ -26,3 +26,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 jomodas_db
+
+# Build do Flutter Web enviado ao servidor
+/deploy/front/*
+!/deploy/front/.gitkeep
