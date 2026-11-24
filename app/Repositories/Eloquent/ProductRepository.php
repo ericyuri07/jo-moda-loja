@@ -28,4 +28,23 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->latest()
             ->paginate();
     }
+
+    public function syncSuggestions(Product $product, array $suggestionIds): void
+    {
+        $product->suggestions()->sync(
+            collect($suggestionIds)
+                ->values()
+                ->mapWithKeys(fn (string $id, int $position): array => [$id => ['position' => $position]])
+        );
+    }
+
+    public function loadSuggestions(Product $product, bool $onlyActive = true): Product
+    {
+        return $product->load([
+            'suggestions' => fn ($query) => $query->when(
+                $onlyActive,
+                fn ($query) => $query->where('active', true)
+            ),
+        ]);
+    }
 }

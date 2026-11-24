@@ -27,9 +27,11 @@ class ProductController extends Controller
 
     public function show(Request $request, Product $product)
     {
-        abort_if(! $product->active && ! $this->isAdmin($request), 404, 'Produto não encontrado.');
+        $isAdmin = $this->isAdmin($request);
 
-        return response()->json($this->service->find($product));
+        abort_if(! $product->active && ! $isAdmin, 404, 'Produto não encontrado.');
+
+        return response()->json($this->service->find($product, onlyActive: ! $isAdmin));
     }
 
     public function update(ProductUpdateRequest $request, Product $product)

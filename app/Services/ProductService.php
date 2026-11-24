@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Product;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class ProductService
@@ -16,9 +18,11 @@ class ProductService
         return $this->repository->paginate($filters, $onlyActive);
     }
 
-    public function find(Product $product): Product
+    public function find(Product $product, bool $onlyActive = true): Product
     {
-        return $this->repository->loadRelations($product);
+        $this->repository->loadRelations($product);
+
+        return $this->repository->loadSuggestions($product, $onlyActive);
     }
 
     public function create(array $data): Product
@@ -28,7 +32,12 @@ class ProductService
             $data['promotional_price'] ?? null
         );
 
-        return $this->repository->create($data);
+        $suggestionIds = Arr::pull($data, 'suggestion_ids');
+
+        return DB::transaction(fn (): Product => $this->saveSuggestions(
+            $this->repository->create($data),
+            $suggestionIds
+        ));
     }
 
     public function update(Product $product, array $data): Product
@@ -40,12 +49,31 @@ class ProductService
 
         $this->ensurePromotionalPriceIsLowerThanPrice($price, $promotionalPrice);
 
-        return $this->repository->update($product, $data);
+        $suggestionIds = Arr::pull($data, 'suggestion_ids');
+
+        return DB::transaction(fn (): Product => $this->saveSuggestions(
+            $this->repository->update($product, $data),
+            $suggestionIds
+        ));
     }
 
     public function delete(Product $product): void
     {
         $this->repository->delete($product);
+    }
+
+    /**
+     * Sem a lista (null), os sugeridos ficam como estão; vazia, são removidos.
+     *
+     * @param  list<string>|null  $suggestionIds
+     */
+    private function saveSuggestions(Product $product, ?array $suggestionIds): Product
+    {
+        if ($suggestionIds !== null) {
+            $this->repository->syncSuggestions($product, $suggestionIds);
+        }
+
+        return $this->repository->loadSuggestions($product, onlyActive: false);
     }
 
     /**

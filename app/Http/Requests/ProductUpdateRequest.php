@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -43,6 +44,13 @@ class ProductUpdateRequest extends FormRequest
             'image_url' => ['nullable', 'url', 'max:255'],
             'featured' => ['sometimes', 'boolean'],
             'active' => ['sometimes', 'boolean'],
+            'suggestion_ids' => ['sometimes', 'array', 'max:'.Product::MAX_SUGGESTIONS],
+            'suggestion_ids.*' => [
+                'uuid',
+                'distinct',
+                'exists:products,id',
+                Rule::notIn([$this->route('product')->id]),
+            ],
         ];
     }
 
@@ -77,6 +85,13 @@ class ProductUpdateRequest extends FormRequest
 
             'featured.boolean' => 'O campo destaque deve ser verdadeiro ou falso.',
             'active.boolean' => 'O campo ativo deve ser verdadeiro ou falso.',
+
+            'suggestion_ids.array' => 'Os produtos sugeridos são inválidos.',
+            'suggestion_ids.max' => 'Escolha no máximo :max produtos sugeridos.',
+            'suggestion_ids.*.uuid' => 'Um dos produtos sugeridos é inválido.',
+            'suggestion_ids.*.distinct' => 'Há produtos sugeridos repetidos.',
+            'suggestion_ids.*.exists' => 'Um dos produtos sugeridos não existe mais.',
+            'suggestion_ids.*.not_in' => 'Um produto não pode sugerir ele mesmo.',
         ];
     }
 }
